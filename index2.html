@@ -1,0 +1,313 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户学习界面</title>
+</head>
+<body>
+    <div>
+        <div id="a"></div>
+        <div id="b">
+            <div>开始学习选1</div>
+            <div>结束学习选2</div>
+            <div>查看学习时长选3</div>
+            <div>查看学习次数选4</div>
+            <div>退出学习5</div>
+        </div>
+        <form id="c">
+            <select name="model">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <input type="button" value="submit">
+        </form>
+        <div id='d'></div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+        // 获取URL中的查询字符串
+        var params = new URLSearchParams(window.location.search);
+        // 获取value参数的值
+        var name = params.get("name");
+        })
+
+        var b=0;
+        var a=document.getElementById('c')
+        var from=new FormData(a)
+        b=from.get('model')
+        
+        from.addEventListener('submit',function(event){
+            event.preventDefault();
+        })
+
+        if(b==5)
+        {document.getElementById(a).innerHTML="3秒钟后退回到主页面"
+        setTimeout(window.location.href = 'index.html',3000)}
+
+        if(b!=5 && b!=0)//只有当正确输入时才会和后端服务器建立联系
+        {fetch("http://127.0.0.1:8000/search",{method : "post",headers:{"content-type":application/json},body:JSON.stringify({'name':name,'model':b})})
+        .then(Response =>{
+            Response.json();
+        })
+        .then(data =>{
+            if(data.status=='error')
+                {document.getElementById('a').innerHTML="出错了，请检查你是否正确输入了操作"}
+            else if ('time' in data)//判断是否有time属性
+                {time=data.time;
+                document.getElementById('d').innerHTML="user"+name+"学习时长为"+time;
+                }
+            else if('times' in data)
+                {times=data.times;
+                document.getElementById('d').innerHTML="user"+name+"学习次数为"+times;
+                }
+            else if ('model' in data)
+                {if(data.model==1)
+                document.getElementById('d').innerHTML="user"+name+"正在学习";
+                else if (data.model==2)
+                document.getElementById('d').innerHTML="user"+name+"没在卷";
+                }
+        })
+        .catch(error =>{
+            document.getElementById('a').innerHTML="出错了"
+        })}
+    </script>
+</body>
+</html> -->
+<!-- 你的代码中的问题出现在了下面这一段：
+
+```javascript
+var from = new FormData(a);
+b = from.get('model');
+```
+
+`FormData` 是用来收集表单数据的对象，它会将表单元素的值（例如 `<input>` 和 `<select>`）存储在一个类似于字典的结构中。然而，`FormData` 本身并没有 `addEventListener` 方法，这是因为 `FormData` 是一个数据结构，而不是一个 DOM 元素。
+
+### 改进思路：
+1. `FormData` 不适合用于添加事件监听器。你应该把事件监听器绑定到实际的表单元素（即 `form`），而不是 `FormData` 对象。
+2. `b = from.get('model')` 这行代码尝试在表单提交之前读取选择的值，但是这样做在代码执行时会不准确，因为它是在 DOM 加载时就尝试获取表单的值，而不是在用户提交时获取。
+
+你需要先监听表单的 `submit` 事件，等待用户提交表单时再获取表单数据。然后根据用户的选择执行相应的操作。
+
+### 改进后的代码： -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户学习界面</title>
+</head>
+<body>
+    <div>
+        <div id="a"></div>
+        <div id="b">
+            <div>开始学习选1</div>
+            <div>结束学习选2</div>
+            <div>查看学习时长选3</div>
+            <div>查看学习次数选4</div>
+            <div>退出学习5</div>
+        </div>
+        <form id="c">
+            <select name="model">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <input type="submit" value="submit">  //改为 type="submit"
+        </form>
+        <div id='d'></div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            // 获取URL中的查询字符串
+            var params = new URLSearchParams(window.location.search);
+            // 获取value参数的值
+            var name = params.get("name");
+            
+            // 获取表单元素
+            var form = document.getElementById('c');
+            
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();  // 阻止表单默认提交
+
+                // 获取选中的选项
+                var b = form.querySelector('select[name="model"]').value;
+
+                if (b == 5) {
+                    document.getElementById('a').innerHTML = "3秒钟后退回到主页面";
+                    setTimeout(function() {
+                        window.location.href = 'index.html';
+                    }, 3000);
+                } else if (b != 5 && b != 0) {  // 只有在选择了有效选项时才进行后端请求
+                    fetch("http://127.0.0.1:8000/search", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            'name': name,
+                            'model': b
+                        })
+                    })
+                    .then(response => response.json())  // 解析为JSON
+                    .then(data => {
+                        if (data.status == 'error') {
+                            document.getElementById('a').innerHTML = "出错了，请检查你是否正确输入了操作";
+                        } else if ('time' in data) {
+                            var time = data.time;
+                            document.getElementById('d').innerHTML = "user " + name + " 学习时长为 " + time;
+                        } else if ('times' in data) {
+                            var times = data.times;
+                            document.getElementById('d').innerHTML = "user " + name + " 学习次数为 " + times;
+                        } else if ('model' in data) {
+                            if (data.model == 0) {
+                                document.getElementById('d').innerHTML = "user " + name + " 正在学习";
+                            } else if (data.model == 1) {
+                                document.getElementById('d').innerHTML = "user " + name + " 没在学习";
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        document.getElementById('a').innerHTML = "出错了";
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html> -->
+
+<!-- ### 代码改进要点：
+1. **表单提交监听**：
+   - 我们把 `addEventListener` 绑定到 `<form>` 元素本身，而不是 `FormData` 对象上。监听的是表单的 `submit` 事件，确保只有用户提交表单时才会执行后续的操作。
+   
+2. **获取选择的值**：
+   - `var b = form.querySelector('select[name="model"]').value;` 这一行确保获取用户选择的下拉框的值。
+   
+3. **阻止默认提交**：
+   - 在表单提交时使用 `event.preventDefault()` 来阻止浏览器的默认行为（即刷新页面），这样可以在 JavaScript 中处理表单数据。
+
+4. **后端请求**：
+   - 通过 `fetch` 向后端发送 POST 请求，在请求体中传递用户名和所选操作，并处理返回的 JSON 数据。
+
+5. **操作不同选择**：
+   - 根据用户选择的 `model` 值来决定显示的信息或执行的操作。例如，选择 `5` 会导致页面跳转，选择其他有效选项会进行后台请求并显示相应结果。
+
+### 修复的关键点：
+- **FormData 使用错误**：`FormData` 对象本身不能直接添加事件监听器，应该绑定事件到 DOM 元素（如 `<form>`）上。
+- **获取表单数据**：要等到表单提交后再获取数据，并且应通过正确的方式获取选择的值。 -->
+
+<!-- 你遇到的问题是在前端代码中表单提交无法触发。原因是你使用了 <input type="button" value="submit">，它并不会触发表单提交事件，因为它只是一个按钮，并不是一个实际的提交按钮。
+
+为了让表单提交事件触发，你可以把按钮的类型改为 <input type="submit">，这样按钮就会触发表单的提交事件。此外，在你的脚本中需要修改一些逻辑，确保能够正确地获取表单中的值并处理表单提交。 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户学习界面</title>
+</head>
+<body>
+    <div>
+        <div id="a"></div>
+        <div id="b">
+            <div>开始学习选1</div>
+            <div>结束学习选2</div>
+            <div>查看学习时长选3</div>
+            <div>查看学习次数选4</div>
+            <div>退出学习5</div>
+        </div>
+        <form id="c">
+            <select name="model">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <input type="submit" value="submit">
+        </form>
+        <div id='d'></div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            // 尝试从 localStorage 获取 'username'
+        var name = localStorage.getItem('username');
+            
+            // 如果没有存储 username，说明是第一次加载页面，从 URL 获取并保存到 localStorage
+        if (!name) {
+            var params = new URLSearchParams(window.location.search);
+            name = params.get("name");  // 获取URL中的name参数
+
+            if (name) {
+                localStorage.setItem('username', name);  // 将 'name' 存储到 localStorage
+            } else {
+                // 如果没有获取到name参数，可以跳转回登录页
+                window.location.href = "login.html";
+                return;
+            }
+        }
+        // document.addEventListener("DOMContentLoaded", function(event) {
+        //     // 获取URL中的查询字符串
+        //     var params = new URLSearchParams(window.location.search);
+        //     const x = params.get("name");  // 获取URL参数中的name值
+        // const name=x;
+            // 获取表单元素
+        var form = document.getElementById('c');
+            
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // 阻止表单默认提交
+
+            // 获取选中的选项值
+        var b = form.querySelector('select[name="model"]').value;
+
+        if (b == 5) {
+            document.getElementById('a').innerHTML = "3秒钟后退回到主页面";
+            setTimeout(function() {
+                window.location.href = 'index.html';  // 3秒后返回主页面
+            }, 3000);
+            } 
+        else if (b != 5 && b != 0) {  // 只有在选择了有效选项时才进行后端请求
+            fetch("http://127.0.0.1:8000/search", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"  // 设置请求头为JSON格式
+            },
+                body: JSON.stringify({
+                    'name': name,    // 传递用户名
+                    'model': b       // 传递选中的操作类型
+                })
+            })
+            .then(response => response.json())  // 解析响应为JSON
+            .then(data => {
+                if (data.status == 'error') {
+                    document.getElementById('a').innerHTML = "出错了: " + data.message;
+                } else if ('time' in data) {
+                    var time = data.time;
+                    document.getElementById('d').innerHTML = "user " + name + " 学习时长为 " + time;
+                } else if ('times' in data) {
+                    var times = data.times;
+                    document.getElementById('d').innerHTML = "user " + name + " 学习次数为 " + times;
+                } else if ('model' in data) {
+                    if (data.model == 1) {
+                        document.getElementById('d').innerHTML = "user " + name + " 正在学习";
+                    } else if (data.model == 2) {
+                        document.getElementById('d').innerHTML = "user " + name + " 没在学习";
+                    }
+                }
+            })
+            .catch(error => {
+                document.getElementById('a').innerHTML = "出错了";
+            });
+        }
+        });
+    });
+    </script>
+</body>
+</html>

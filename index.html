@@ -1,0 +1,197 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录界面</title>
+    <style>
+        #a{
+            width: 100%;
+            height: 100%;
+            background-image: none;
+
+            display:flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #b{
+            width: 10%;
+            background-color: antiquewhite;
+            margin-top: 300px;
+        }
+        #c{
+            width: 10%;
+            height: 20%;
+        }
+        #d{
+            width: 10%;
+            display:flex;
+        }
+        </style>
+</head>
+<body>
+    <div id="a">
+        <div id="b">
+            请输入id名和密码
+        </div> 
+        <form  id="c"> //action="http://127.0.0.1:8000/login/" method="post" 
+            <input id='input1' type="text" placeholder="请输入你的名字" name="username">
+            <input id='input2' type="text" placeholder="请输入你的密码" name="password">
+            <input type="submit" value="提交">
+        </form>
+        <div id="d">
+            <div id="d_1">返回信息</div>
+            <div id="d_2"></div>
+        </div>
+    </div>
+    <script>
+        var form = document.getElementById('c');//错误一：必须定义form
+
+        // 监听表单提交事件
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // 防止表单默认提交行为
+        })
+        // 防止表单自动提交：将 fetch 请求的调用放到表单的提交事件处理程序里，这样只有在用户点击提交按钮后才会触发。
+
+        datas=new FormData(form);
+        var usernam=datas.get('username');
+        var passwor=datas.get('password');
+        
+        fetch("http://127.0.0.1:8000/login",
+        {method : "post",headers:{'Content-Type': 'application/json'},body:JSON.stringify({username:usernam, password:passwor})}//我他妈还得括个大括号,而且是JSON
+        )
+        // 我先试试用json格式发送吧
+        .then(response => response.json())//这个代码格式还是不太懂
+        .then(data =>{
+            a=data.data.model
+            if (a==1)
+                {document.getElementById("d_2").innerHTML='user'+usernam+'log in successfully'+'The page will be re-directed in three seconds. Please wait a moment...'
+                setTimeout(window.location.href = "index2.html?name=" + b,3000)
+                }//这个可能可以实现
+            else if (a==0)
+                {document.getElementById("d_2").innerHTML='user'+usernam+'register successfully'+'please rewrite again'}
+            else if (a==2)
+            document.getElementById('d_2').innerHTML='Invalid username or password'
+            else
+            document.getElementById('d_2').innerHTML='error'
+        })
+        .catch(error =>{
+            document.getElementById('d_2').innerHTML='error!'
+        })
+        .finally(console.log("hhh"))
+    </script>
+</body>
+</html> -->
+<!-- <script>
+        // 创建一个对象
+        let abc= new XMLHttpRequest()
+        // 指定open方法（就是设置请求方式的）
+        abc.open('post','http://127.0.0.1:8000/login')
+        //获取form表单的值
+        let fo = new FormData(document.querySelector('form'))
+        //发送表单
+        abc.send(fo)
+        //设置回调函数获取服务器的值(应该是绑定了onload事件)
+        abc.onload=function(){
+            document.getElementById("d_2").innerHTML=abc.response
+            console.log(abc.response)//应该是浏览器渲染顺序问题，script在body前获取不到DOM元素
+        }
+    </script> -->
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>用户登录界面</title>
+        <style>
+            #a {
+                width: 100%;
+                height: 100%;
+                background-image: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            #b {
+                width: 10%;
+                background-color: antiquewhite;
+                margin-top: 300px;
+            }
+            #c {
+                width: 10%;
+                height: 20%;
+            }
+            #d {
+                width: 10%;
+                display: flex;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="a">
+            <div id="b">
+                请输入id名和密码
+            </div> 
+            <form id="c">
+                <input id="username" type="text" placeholder="请输入你的名字" name="username" required>
+                <input id="password" type="password" placeholder="请输入你的密码" name="password" required>
+                <input type="submit" value="提交">
+            </form>
+            <div id="d">
+                <div id="d_1">返回信息</div>
+                <div id="d_2"></div>
+            </div>
+        </div>
+        <script>
+            var form = document.getElementById('c'); // 获取表单元素
+    
+            // 监听表单提交事件
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // 防止表单默认提交行为
+    
+                // 获取表单数据
+                var datas = new FormData(form);
+                var usernam = datas.get('username');
+                var passwor = datas.get('password');
+                
+                // 提交数据给后端
+                fetch("http://127.0.0.1:8000/login", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernam, password: passwor })
+                })
+                .then(response => response.json())  // 解析返回的 JSON 数据
+                .then(data => {
+                    var a = data.data.model;
+                    if (a == 1) {
+                        document.getElementById("d_2").innerHTML = '用户 ' + usernam + ' 登录成功！3秒后自动跳转...';
+                        setTimeout(function() {
+                            window.location.href = "index2.html?name=" + usernam;
+                        }, 3000);
+                    } else if (a == 0) {
+                        document.getElementById("d_2").innerHTML = '用户 ' + usernam + ' 注册成功！请重新填写。';
+                        setTimeout(function() {
+                            var c;  // 聚焦到用户名输入框
+                        }, 3000);
+                    } else if (a == 2) {
+                        document.getElementById('d_2').innerHTML = '用户名或密码无效';
+                        setTimeout(function() {
+                            var c;
+                        }, 3000);
+                    } else {
+                        document.getElementById('d_2').innerHTML = '错误！';
+                        setTimeout(function() {
+                            document.getElementById("username").focus();  // 聚焦到用户名输入框
+                        }, 3000);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('d_2').innerHTML = '请求错误！';
+                });
+            });
+        </script>
+    </body>
+    </html>
