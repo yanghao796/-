@@ -235,11 +235,12 @@ b = from.get('model');
         </form>
         <div id='d'></div>
     </div>
-    <script>
+    <script>//加载页面就会执行？
+
+// DOMContentLoaded 事件会在文档的 HTML 被完全加载和解析完成后触发，不需要等待样式表、图片和子框架等其他资源的加载。通常用这个事件比 window.onload 更加高效。
+        // 尝试从 localStorage 获取 'username'
         document.addEventListener("DOMContentLoaded", function(event) {
-            // 尝试从 localStorage 获取 'username'
         var name = localStorage.getItem('username');
-            
             // 如果没有存储 username，说明是第一次加载页面，从 URL 获取并保存到 localStorage
         if (!name) {
             var params = new URLSearchParams(window.location.search);
@@ -253,60 +254,80 @@ b = from.get('model');
                 return;
             }
         }
+        })
+
+
+        
         // document.addEventListener("DOMContentLoaded", function(event) {
         //     // 获取URL中的查询字符串
         //     var params = new URLSearchParams(window.location.search);
         //     const x = params.get("name");  // 获取URL参数中的name值
         // const name=x;
-            // 获取表单元素
+        // 获取表单元素
+        
         var form = document.getElementById('c');
-            
-        form.addEventListener('submit', function(event) {
-            event.preventDefault(); // 阻止表单默认提交
 
+        form.addEventListener('submit', function(event) 
+    {
+        event.preventDefault(); // 阻止表单默认提交
+        var name = localStorage.getItem('username');
+        
             // 获取选中的选项值
         var b = form.querySelector('select[name="model"]').value;
 
-        if (b == 5) {
+        if (b == 5) 
+        {
             document.getElementById('a').innerHTML = "3秒钟后退回到主页面";
-            setTimeout(function() {
+            setTimeout(function() 
+            {
                 window.location.href = 'index.html';  // 3秒后返回主页面
             }, 3000);
-            } 
-        else if (b != 5 && b != 0) {  // 只有在选择了有效选项时才进行后端请求
-            fetch("http://127.0.0.1:8000/search", {
+        } 
+        else if (b != 5 && b != 0) 
+        {  // 只有在选择了有效选项时才进行后端请求
+            fetch("http://127.0.0.1:8000/search", 
+            {
                 method: "POST",
-                headers: {
+                headers: 
+                {
                     "Content-Type": "application/json"  // 设置请求头为JSON格式
-            },
-                body: JSON.stringify({
+                },
+                body: JSON.stringify
+                ({
                     'name': name,    // 传递用户名
                     'model': b       // 传递选中的操作类型
                 })
             })
             .then(response => response.json())  // 解析响应为JSON
-            .then(data => {
-                if (data.status == 'error') {
+            .then(data => 
+            {
+                if (data.status == 'error') 
+                {
                     document.getElementById('a').innerHTML = "出错了: " + data.message;
-                } else if ('time' in data) {
+                } else if ('time' in data) 
+                {
                     var time = data.time;
                     document.getElementById('d').innerHTML = "user " + name + " 学习时长为 " + time;
-                } else if ('times' in data) {
+                } else if ('times' in data) 
+                {
                     var times = data.times;
                     document.getElementById('d').innerHTML = "user " + name + " 学习次数为 " + times;
-                } else if ('model' in data) {
-                    if (data.model == 1) {
+                } else if ('model' in data) 
+                {
+                    if (data.model == 0) 
+                    {
                         document.getElementById('d').innerHTML = "user " + name + " 正在学习";
-                    } else if (data.model == 2) {
+                    } else if (data.model == 1) 
+                    {
                         document.getElementById('d').innerHTML = "user " + name + " 没在学习";
                     }
                 }
             })
-            .catch(error => {
+            .catch(error => 
+            {
                 document.getElementById('a').innerHTML = "出错了";
             });
         }
-        });
     });
     </script>
 </body>
