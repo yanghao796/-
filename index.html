@@ -58,7 +58,7 @@
         var usernam=datas.get('username');
         var passwor=datas.get('password');
         
-        fetch("http://127.0.0.1:8000/login",
+        fetch("http://10.17.247.116:8000/login",
         {method : "post",headers:{'Content-Type': 'application/json'},body:JSON.stringify({username:usernam, password:passwor})}//我他妈还得括个大括号,而且是JSON
         )
         // 我先试试用json格式发送吧
